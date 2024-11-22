@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -14,10 +14,12 @@ export default function Level7({ navigation }) {
   const [currentQuestion, setCurrentQuestion] = useState(1); // Start with the first question
   const [userAnswer, setUserAnswer] = useState(""); // User's answer for the current question
   const [showFeedback, setShowFeedback] = useState(""); // Show feedback for correct/incorrect answers
-  
+
   const timeDuration = 30;
   const [timeLeft, setTimeLeft] = useState(timeDuration); // Timer state for 60 seconds
   const [timerActive, setTimerActive] = useState(false); // Flag to track if the timer is active
+
+  const timerRef = useRef(null); // Reference to store the timer interval ID
 
   const questions = [
     {
@@ -63,14 +65,14 @@ export default function Level7({ navigation }) {
         setCurrentQuestion(currentQuestion + 1);
         setModalVisible(true); // Show next modal
       } else {
-        setShowFeedback("Congratulations! You've completed all the questions.");
+        setShowFeedback("Congratulations!");
         setTimeout(() => {
           setModalVisible(false);
           navigation.navigate("Level 8");
-        }, 1500);
+        }, 1000);
       }
     } else {
-      setShowFeedback("Incorrect! Try again!.");
+      setShowFeedback("Incorrect! Try again!");
       setCurrentQuestion(1); // Restart the game
       setModalVisible(false); // Close all modals
       resetTimer(); // Reset the timer if the answer is wrong
@@ -101,7 +103,6 @@ export default function Level7({ navigation }) {
               </TouchableOpacity>
             ))}
 
-
             {currentQuestion === questions.length && (
               <Text style={styles.correctFeedbackText}>{showFeedback}</Text>
             )}
@@ -114,11 +115,14 @@ export default function Level7({ navigation }) {
 
   // Function to start the timer when the first question modal appears
   const startTimer = () => {
-    setTimerActive(true);
-    const timer = setInterval(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current); // Clear any existing timer
+    }
+
+    timerRef.current = setInterval(() => {
       setTimeLeft((prevTime) => {
         if (prevTime === 1) {
-          clearInterval(timer); // Stop the timer
+          clearInterval(timerRef.current); // Stop the timer
           resetGame(); // Reset the game if time runs out
         }
         return prevTime - 1;
@@ -128,7 +132,7 @@ export default function Level7({ navigation }) {
 
   // Function to reset the game
   const resetGame = () => {
-    setTimeLeft(timeDuration); // Reset time to 60 seconds
+    setTimeLeft(timeDuration); // Reset time to initial time duration
     setCurrentQuestion(1); // Restart from the first question
     setModalVisible(false); // Close any open modals
     setShowFeedback(""); // Clear any feedback
@@ -136,9 +140,21 @@ export default function Level7({ navigation }) {
 
   // Reset the timer if the answer is wrong
   const resetTimer = () => {
-    setTimeLeft(timeDuration); // Reset time to 60 seconds
+    if (timerRef.current) {
+      clearInterval(timerRef.current); // Stop any active timer
+    }
+    setTimeLeft(timeDuration); // Reset time to initial time duration
     setTimerActive(false); // Stop the timer
   };
+
+  useEffect(() => {
+    // Clean up the timer when the component unmounts
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -156,7 +172,9 @@ export default function Level7({ navigation }) {
         <Text style={styles.buttonText}>Start</Text>
       </Pressable>
 
-      <Text style={styles.feedbackText}>{showFeedback}</Text>
+      {currentQuestion !== 6 && (
+        <Text style={styles.badFeedbackText}>{showFeedback}</Text>
+      )}
 
       {/* Render the current question modal */}
       {renderQuestionModal()}
@@ -220,7 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  feedbackText: {
+  badFeedbackText: {
     marginTop: 20,
     fontSize: 16,
     fontWeight: "bold",
