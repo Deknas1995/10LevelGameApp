@@ -19,7 +19,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Level 5"
+        initialRouteName="Level 7"
         screenOptions={{ headerShown: true, headerLeft: null }}
       >
         <Stack.Screen name="Level 1" component={Level1} />
