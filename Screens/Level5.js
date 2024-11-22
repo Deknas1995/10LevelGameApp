@@ -9,44 +9,76 @@ import {
   Dimensions,
 } from "react-native";
 
+import { Audio } from "expo-av";
+import wrongSound from "../Sounds/btn_click.mp3";
+
+const playSound = async (soundFile) => {
+  const { sound } = await Audio.Sound.createAsync(soundFile);
+  await sound.playAsync();
+};
+
 export default function Level5({ navigation }) {
   const pan = useRef(new Animated.ValueXY()).current;
   const [lastTap, setLastTap] = useState(null);
 
-  const disableResetRef = useRef(false); // Use ref instead of state for immediate updates
-  const targetPosition = useRef({ x: 0, y: 0 }); // Use ref to track the target box's position
-  const boxPosition = useRef({ x: 0, y: 0 }); // Track the draggable box's position
+  const disableResetRef = useRef(false);
+  const targetPosition = useRef({ x: 0, y: 0 });
+  const boxPosition = useRef({ x: 0, y: 0 });
+  const [failCount, setFailCount] = useState(0);
+
+  // Create an animated value for color
+  const [colorAnim] = useState(new Animated.Value(0)); // 0 represents the original color, 1 represents light green
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
+        console.log("grant");
+
+        // Animate the background color to light green when pressing the box
+        Animated.timing(colorAnim, {
+          toValue: 1, // Light green color
+          duration: 10,
+          useNativeDriver: false,
+        }).start();
+
         // Ensure the pan value is updated to match the box's current position
         pan.setOffset({
-          x: pan.x._value, // Current x position
-          y: pan.y._value, // Current y position
+          x: pan.x._value,
+          y: pan.y._value,
         });
-        pan.setValue({ x: 0, y: 0 }); // Reset animated value to zero for smooth dragging
+        pan.setValue({ x: 0, y: 0 });
       },
-      onPanResponderMove: Animated.event(
-        [
-          null,
-          { dx: pan.x, dy: pan.y }, // Map gesture movement to the animated values
-        ],
-        { useNativeDriver: false }
-      ),
+      onPanResponderMove: (event, gestureState) => {
+        Animated.event(
+          [
+            null,
+            { dx: pan.x, dy: pan.y },
+          ],
+          { useNativeDriver: false }
+        )(event, gestureState);
+      },
       onPanResponderRelease: () => {
+        console.log("release");
+
+        // Revert the background color to the original color when the box is released
+        Animated.timing(colorAnim, {
+          toValue: 0, // Revert back to original color
+          duration: 10,
+          useNativeDriver: false,
+        }).start();
+
         if (!disableResetRef.current) {
-          console.log("reset");
+          setFailCount((prev) => prev + 1);
+
           // Reset to starting position
           Animated.spring(pan, {
             toValue: { x: 0, y: 0 },
             useNativeDriver: false,
           }).start();
         } else {
-          // Maintain current position (no reset)
-          pan.flattenOffset(); // Ensure the new position is retained
-          boxPosition.current = { x: pan.x._value, y: pan.y._value }; // Update box position on release
+          pan.flattenOffset();
+          boxPosition.current = { x: pan.x._value, y: pan.y._value };
           checkIfBoxInsideTarget();
         }
       },
@@ -58,36 +90,35 @@ export default function Level5({ navigation }) {
     const DOUBLE_PRESS_DELAY = 300;
 
     if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
-      disableResetRef.current = true; // Update ref value immediately
+      disableResetRef.current = true;
     } else {
       setLastTap(now);
     }
   };
 
-  // Check if the box is inside the target box (basic proximity check)
   const checkIfBoxInsideTarget = () => {
-    const targetSize = 120; // Target box size (could be dynamic)
-    const boxSize = 100; // Box size (could be dynamic)
+    const targetSize = 120;
+    const boxSize = 100;
 
-    // Basic bounding box check: box is inside target box if its position is within the target's boundaries
     const boxX = boxPosition.current.x;
     const boxY = boxPosition.current.y;
 
-    console.log("X = " + boxX + " Y = " + boxY);
     const placeArea = Dimensions.get("window").height / 2.14;
-    console.log("boxY + placeArea = " + (boxY + placeArea));
     if (boxY + placeArea < 0) {
-      console.log("Box placed in target. Navigating to next level.");
       navigation.navigate("Level 6");
     }
   };
 
-  // Set target box position using onLayout
   const handleTargetLayout = (event) => {
     const { x, y } = event.nativeEvent.layout;
-    targetPosition.current = { x, y }; // Update ref with target box's position
-    console.log("Target Box Position:", { x, y });
+    targetPosition.current = { x, y };
   };
+
+  // Interpolating the color based on colorAnim value
+  const boxColor = colorAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["rgb(0,200,0)", "rgb(144,238,144)"], // From original color to light green
+  });
 
   return (
     <View style={styles.container}>
@@ -98,10 +129,9 @@ export default function Level5({ navigation }) {
           styles.targetBox,
           { width: Dimensions.get("window").width },
         ]}
-        onLayout={handleTargetLayout} // Capture the position of the target box
+        onLayout={handleTargetLayout}
       >
         <Text style={styles.targetText}>Place the box here</Text>
-        <View />
       </View>
 
       <Animated.View
@@ -110,10 +140,14 @@ export default function Level5({ navigation }) {
         style={[
           styles.box,
           { transform: pan.getTranslateTransform() },
+          { backgroundColor: boxColor }, // Apply animated color
           Platform.OS === "web" ? { cursor: "grab" } : {},
-          
         ]}
       />
+
+      {failCount >= 3 && (
+        <Text style={styles.hint}>Hint: double press to unlock.</Text>
+      )}
     </View>
   );
 }
@@ -148,16 +182,11 @@ const styles = StyleSheet.create({
   box: {
     width: 100,
     height: 100,
-    backgroundColor: "rgb(0,200,0)",
     borderRadius: 10,
-    shadowColor: "rgb(200,100,200)",
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  pressed:{
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    backgroundColor: "rgb(244,0,0)",
-  }
+  hint: {
+    backgroundColor: "rgb(224,224,224)",
+    padding: 10,
+    borderRadius: 7,
+  },
 });
