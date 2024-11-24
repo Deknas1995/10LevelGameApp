@@ -9,14 +9,6 @@ import {
   Dimensions,
 } from "react-native";
 
-import { Audio } from "expo-av";
-import wrongSound from "../Sounds/btn_click.mp3";
-
-const playSound = async (soundFile) => {
-  const { sound } = await Audio.Sound.createAsync(soundFile);
-  await sound.playAsync();
-};
-
 export default function Level5({ navigation }) {
   const pan = useRef(new Animated.ValueXY()).current;
   const [lastTap, setLastTap] = useState(null);

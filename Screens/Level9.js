@@ -9,7 +9,10 @@ import {
   Dimensions,
   Modal,
   TouchableOpacity,
+  Button,
 } from "react-native";
+import { Audio } from "expo-av";
+import wrongSound from "../Sounds/btn_click.mp3";
 
 const emojiList = [
   "🦈", "🐛", "🐑", "🐝", "🐋", "🦉", "🐀", "🦄", "🐕", "🐢", 
@@ -20,6 +23,9 @@ const emojiList = [
   "🦣", "🐇", "🐿️", "🐍", "🦎", "🐩", "🐗", "🦌", "🦢", "🐥", 
   "🦫", "🐏", "🪶", "🐭", "🦦", "🐴", "🐬", "🐇", "🐯", "🐾", 
   "🦛", "🐓", "🦏", "🐿️", "🦄", "🐬", "🐒", "🦓", "🦨", "🐹", 
+  "🦈", "🐛", "🐑", "🐝", "🐋", "🦉", "🐀", "🦄", "🐕", "🐢", 
+  "🦜", "🐠", "🐓", "🐷", "🦍", "🐘", "🐂", "🐶", "🦧", "🐄", 
+  "🦥", "🦦", "🐱", "🦚", "🐡", "🦨", "🦩", "🦙", "🐬", "🦃", 
   "🐖", "🐸", "🦥", "🐒", "🦆", "🐒", "🦤", "🦦", "🦢", "🐣", 
   "🐺", "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", 
   "🦭", "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", 
@@ -34,6 +40,12 @@ const emojiList = [
   "🐓", "🦏", "🐿️", "🦄", "🐬", "🦛", "🦓", "🦨", "🐹", "🐖", 
   "🐸", "🦥", "🐒", "🦆", "🐒", "🦤", "🦦", "🦢", "🐣", "🐺", 
   "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", "🦭", 
+  "🦈", "🐛", "🐑", "🐝", "🐋", "🦉", "🐀", "🦄", "🐕", "🐢", 
+  "🦜", "🐠", "🐓", "🐷", "🦍", "🐘", "🐂", "🐶", "🦧", "🐄", 
+  "🦥", "🦦", "🐱", "🦚", "🐡", "🦨", "🦩", "🦙", "🐬", "🦃", 
+  "🦈", "🐛", "🐑", "🐝", "🐋", "🦉", "🐀", "🦄", "🐕", "🐢", 
+  "🦜", "🐠", "🐓", "🐷", "🦍", "🐘", "🐂", "🐶", "🦧", "🐄", 
+  "🦥", "🦦", "🐱", "🦚", "🐡", "🦨", "🦩", "🦙", "🐬", "🦃", 
   "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", "🦜", 
   "🐋", "🪲", "🐙", "🦂", "🕷️", "🦗", "🐊", "🦧", "🐩", "🐾", 
   "🪲", "🦛", "🐉", "🐕‍🦺", "🦒", "🦦", "🐏", "🦄", "🐢", "🦜", 
@@ -48,19 +60,60 @@ const emojiList = [
   "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", "🦭", 
   "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", "🦜", 
   "🐋", "🪲", "🐙", "🦂", "🕷️", "🦗", "🐊", "🦧", "🐩", "🐾", 
+  "🐇", "🐿️", "🐍", "🦎", "🐩", "🐗", "🦌", "🦢", "🐥", "🦫", 
+  "🐏", "🪶", "🐭", "🦦", "🐴", "🐬", "🐇", "🐯", "🐾", "🦛", 
+  "🐓", "🦏", "🐿️", "🦄", "🐬", "🦦", "🦓", "🦨", "🐹", "🐖", 
+  "🐸", "🦥", "🐒", "🦆", "🐒", "🦤", "🦦", "🦢", "🐣", "🐺", 
+  "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", "🦭", 
+  "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", "🦜", 
+  "🐋", "🪲", "🐙", "🦂", "🕷️", "🦗", "🐊", "🦧", "🐩", "🐾", 
+  "🐇", "🐿️", "🐍", "🦎", "🐩", "🐗", "🦌", "🦢", "🐥", "🦫", 
+  "🐏", "🪶", "🐭", "🦦", "🐴", "🐬", "🐇", "🐯", "🐾", "🦛", 
+  "🐓", "🦏", "🐿️", "🦄", "🐬", "🦦", "🦓", "🦨", "🐹", "🐖", 
+  "🐸", "🦥", "🐒", "🦆", "🐒", "🦤", "🦦", "🦢", "🐣", "🐺", 
+  "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", "🦭", 
+  "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", "🦜", 
+  "🐋", "🪲", "🐙", "🦂", "🕷️", "🦗", "🐊", "🦧", "🐩", "🐾", 
+  "🦜", "🐠", "🐓", "🐷", "🦍", "🐘", "🐂", "🐶", "🦧", "🐄", 
+  "🦥", "🦦", "🐱", "🦚", "🐡", "🦨", "🦩", "🦙", "🐬", "🦃", 
+  "🦒", "🐕‍🦺", "🦭", "🐌", "🐟", "🐜", "🪳", "🦘", "🐅", "🐞", 
+  "🐒", "🐎", "🦦", "🐪", "🐧", "🐃", "🐒", "🐹", "🦅", "🦋", 
+  "🦥", "🦦", "🐱", "🦚", "🐡", "🦨", "🦩", "🦙", "🐬", "🦃", 
+  "🦒", "🐕‍🦺", "🦭", "🐌", "🐟", "🐜", "🪳", "🦘", "🐅", "🐞", 
+  "🐒", "🐎", "🦦", "🐪", "🐧", "🐃", "🐒", "🐹", "🦅", "🦋", 
+  "🦣", "🐇", "🐿️", "🐍", "🦎", "🐩", "🐗", "🦌", "🦢", "🐥", 
+  "🦫", "🐏", "🪶", "🐭", "🦦", "🐴", "🐬", "🐇", "🐯", "🐾", 
+  "🦛", "🐓", "🦏", "🐿️", "🦄", "🐬", "🐒", "🦓", "🦨", "🐹", 
+  "🦣", "🐇", "🐿️", "🐍", "🦎", "🐩", "🐗", "🦌", "🦢", "🐥", 
+  "🦫", "🐏", "🪶", "🐭", "🦦", "🐴", "🐬", "🐇", "🐯", "🐾", 
+  "🦛", "🐓", "🦏", "🐿️", "🦄", "🐬", "🐒", "🦓", "🦨", "🐹", 
+  "🐖", "🐸", "🦥", "🐒", "🦆", "🐒", "🦤", "🦦", "🦢", "🐣", 
+  "🐺", "🦦", "🐔", "🐤", "🦢", "🐸", "🦥", "🐦", "🐿️", "🦙", 
+  "🦭", "🦮", "🐾", "🦢", "🦬", "🦡", "🐜", "🦎", "🐇", "🐦", 
+  "🦜", "🐋", "🪲", "🐙", "🦂", "🕷️", "🦗", "🐊", "🦧", "🐩", 
+  "🐾", "🦛", "🐉", "🐕‍🦺", "🦒", "🦦", "🐏", "🦄", "🐢", "🦜", 
+  "🐠", "🐓", "🐷", "🦍", "🐘", "🐂", "🐶", "🦧", "🐄", "🦥", 
   "🦛", "🦛", "🐉", "🐕‍🦺", "🦒", "🦦", "🐏", "🦄"
 ];
 
+const playSound = async (soundFile) => {
+  const { sound } = await Audio.Sound.createAsync(soundFile);
+  await sound.playAsync();
+};
 
 export default function Level9({ navigation }) {
-  const timeDuration = 45;
+  const timeDuration = 25;
   const startAnimals = 20;
+  
+  const [startGame, setStartGame] = useState(false);
+
   const [animalCount, setAnimalCount] = useState(startAnimals);
   const [timeLeft, setTimeLeft] = useState(timeDuration);
   const [message, setMessage] = useState(""); // State for message visibility
   const [messageColor, setMessageColor] = useState("red"); // New state for message color
   const [foundCounter, setFoundCounter] = useState(0);
   const [bgColor, setBgColor] = useState("transparent");
+
   const timerRef = useRef(null);
 
   const [shuffledEmojis, setShuffledEmojis] = useState([]);
@@ -85,6 +138,7 @@ export default function Level9({ navigation }) {
     }
 
     timerRef.current = setInterval(() => {
+      playSound(wrongSound);
       setTimeLeft((prevTime) => {
         if (prevTime === 1) {
           clearInterval(timerRef.current);
@@ -100,7 +154,11 @@ export default function Level9({ navigation }) {
     setFoundCounter(0);
     setMessage("You failed! Try again!"); // Show the message
     setMessageColor("red"); // Set the message color to red
-    
+    setBgColor("rgb(255,100,100)")
+    setTimeout(() => {
+      setBgColor("transparent")
+    }, 2000);
+
     setTimeout(() => {
       setAnimalCount(startAnimals);
       handleShuffle();
@@ -128,65 +186,104 @@ export default function Level9({ navigation }) {
     }
   };
 
+  const checkIfGameWon = () => {
+    if (foundCounter >= 6) {
+      clearInterval(timerRef.current);
+      setTimeout(() => {
+        setFoundCounter(0);
+        navigation.navigate("Level 10");
+      }, 2000);
+      return true;
+    }
+    return false;
+  };
+  
   useEffect(() => {
-    setAnimalCount((prev) => prev + 50);
-    handleShuffle(); // Shuffle emojis when component mounts
-    startTimer(); // Start the timer when component mounts
 
+    if(startGame)
+    {
+      startTimer(); // Start the timer when start btn pressed
+      setAnimalCount((prev) => prev + 50);
+      handleShuffle(); // Shuffle emojis when component mounts
+    }
+    
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current); // Clean up timer when component unmounts
       }
     };
-  }, []);
+  }, [startGame]);
 
   return (
     <>
-      {/* Modal shown when enough hedghes found */}
-      {foundCounter >= 6 ? (
+      {/* Initial Modal for Starting the Game */}
+      {!startGame ? (
         <Modal
-          visible={true}
           animationType="slide"
           transparent={true}
+          visible={true}
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalText}>Congratulations, You Win!</Text>
+              <Text style={styles.modalText}>{`You have ${timeDuration}s To Find 6 🦔 `}</Text>
+              <Button style={styles.StartGameBtn} title="Start Game" onPress={() => setStartGame(true)} />
             </View>
           </View>
         </Modal>
       ) : (
         <>
-          {/* The rest of the game content */}
-          <Text style={styles.timerText}>Time Left: {timeLeft}s</Text>
-          {message !== "" && (
-            <Text style={[styles.messageText, { color: messageColor }]}>
-              {message}
-            </Text>
-          )}
-
-          {/* ScrollView for scrolling the emoji list */}
-          <ScrollView
-            style={[styles.scrollView, { height: 1 }, {backgroundColor: bgColor}]}
-            contentContainerStyle={styles.container}
-          >
-            {shuffledEmojis.slice(0, animalCount).map((emoji, index) => (
-              <Pressable key={index} onPress={() => handlePress(emoji)}>
-                <Text
-                  style={[
-                    styles.emoji,
-                    { backgroundColor: emoji === "🦔" ? "red" : null /**/},
-                  ]}
-                >
-                  {emoji}
+          {/* Modal shown when enough hedgehogs are found */}
+          {checkIfGameWon() ? (
+            <Modal
+              visible={true}
+              animationType="slide"
+              transparent={true}
+            >
+              <View style={styles.modalContainer}>
+                <View style={styles.modalContent}>
+                  <Text style={styles.modalText}>Congratulations, You Win!</Text>
+                </View>
+              </View>
+            </Modal>
+          ) : (
+            <>
+              {/* Gameplay Content */}
+              <Text style={styles.timerText}>{`(${foundCounter}/6) Time Left: ${timeLeft}s`}</Text>
+              {message !== "" && (
+                <Text style={[styles.messageText, { color: messageColor }]}>
+                  {message}
                 </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
+              )}
+  
+              {/* ScrollView for scrolling the emoji list */}
+              <ScrollView
+                style={[
+                  styles.scrollView,
+                  { height: 1 },
+                  { backgroundColor: bgColor },
+                ]}
+                contentContainerStyle={styles.container}
+              >
+                {shuffledEmojis.slice(0, animalCount).map((emoji, index) => (
+                  <Pressable key={index} onPress={() => handlePress(emoji)}>
+                    <Text
+                      style={[
+                        styles.emoji,
+                        { /* backgroundColor: emoji === "🦔" ? "red" : null */ },
+                      ]}
+                    >
+                      {emoji}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </>
+          )}
         </>
       )}
     </>
   );
+  
 
 }
 
@@ -245,4 +342,7 @@ const styles = StyleSheet.create({
     textAlign:"center",
     color: "rgb(0,140,0)"
   },
+  StartGameBtn:{
+    borderWidth: 0,
+  }
 });
