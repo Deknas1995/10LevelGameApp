@@ -241,7 +241,7 @@ export default function Level9({ navigation }) {
             >
               <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
-                  <Text style={styles.modalText}>Congratulations, You Win!</Text>
+                  <Text style={styles.modalTextGreen}>Congratulations, You Win!</Text>
                 </View>
               </View>
             </Modal>
@@ -269,7 +269,7 @@ export default function Level9({ navigation }) {
                     <Text
                       style={[
                         styles.emoji,
-                        { /* backgroundColor: emoji === "🦔" ? "red" : null */ },
+                        { /*backgroundColor: emoji === "🦔" ? "red" : null*/ },
                       ]}
                     >
                       {emoji}
@@ -340,7 +340,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign:"center",
-    color: "rgb(0,140,0)"
+    color: "rgb(0,0,0)"
+  },
+  modalTextGreen:{
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign:"center",
+    color: "rgb(0,180,0)"
   },
   StartGameBtn:{
     borderWidth: 0,
