@@ -80,9 +80,12 @@ export default function Level8({ navigation }) {
         setCurrentQuestion(currentQuestion + 1);
         setModalVisible(true); // Show next modal
       } else {
-        setShowFeedback("Congratulations!");
         setTimeout(() => {
           setModalVisible(false);
+        }, 500);
+        
+        setShowFeedback("Congratulations!");
+        setTimeout(() => {
           navigation.navigate("Level 9");
         }, 1000);
       }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Audio } from "expo-av";
 import foundSound from "../Sounds/btn_click.mp3";
+import wrongSound from '../Sounds/wrongBtn.mp3';
 
 export default function Level6({ navigation }) {
   const [counter, setCounter] = useState(0);
@@ -38,13 +39,14 @@ export default function Level6({ navigation }) {
   const handleStop = () => {
     if (isButtonDisabled) return;
 
-    playSound(foundSound);
     setIsRunning(false);
 
     if (counter % 2 === 0) {
+      playSound(foundSound);
       setEvenCount((prevCount) => prevCount + 1);
       setIntervalTime((prev) => prev - 200);
     } else {
+      playSound(wrongSound);
       setEvenCount(0);
       setIntervalTime(1000);
     }

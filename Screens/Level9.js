@@ -9,7 +9,8 @@ import {
   Modal,
 } from "react-native";
 import { Audio } from "expo-av";
-import wrongSound from "../Sounds/btn_click.mp3";
+import foundSound from "../Sounds/btn_click.mp3";
+import wrongSound from '../Sounds/wrongBtn.mp3';
 
 const emojiList = [
   "🦈", "🐛", "🐑", "🐝", "🐋", "🦉", "🐀", "🦄", "🐕", "🐢", 
@@ -135,9 +136,10 @@ export default function Level9({ navigation }) {
     }
 
     timerRef.current = setInterval(() => {
-      playSound(wrongSound);
+      playSound(foundSound);
       setTimeLeft((prevTime) => {
         if (prevTime === 1) {
+          playSound(wrongSound);
           clearInterval(timerRef.current);
           showMessageAndReset(); // Show the message and reset game
         }
