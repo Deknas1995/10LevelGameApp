@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Pressable, Modal, Button } from "react-native";
+import { Audio } from "expo-av";
+import foundSound from "../Sounds/btn_click.mp3";
 
 const allEmojiLists = [
   ["🦈", "🐛", "🐑", "🐝", "🐋", "🦔", "🐀", "🦄", "🐕", "🐢"], // emojiList
@@ -17,8 +19,14 @@ export default function Level10({ navigation }) {
   const [containerWidth, setContainerWidth] = useState(0);
   const [animalRows, setAnimalRows] = useState(1);
   const [emojiLists, setEmojiLists] = useState(allEmojiLists);
+  const [sleepTime, setSleepTime] = useState(1000);
   const [found, setFound] = useState(0);
   const animalCount = 4;
+
+  const playSound = async (soundFile) => {
+    const { sound } = await Audio.Sound.createAsync(soundFile);
+    await sound.playAsync();
+  };
 
   // Measure the width of the container
   const containerRef = useRef(null);
@@ -29,13 +37,14 @@ export default function Level10({ navigation }) {
   const emojiFontSize = containerWidth * 0.1;
 
   useEffect(() => {
+    console.log("mounted");
     const intervalId = setInterval(() => {
       setIndex((prevIndex) => (prevIndex + 1) % allEmojiLists[0].length); //Index 0-9
-    }, 1111);
+    }, sleepTime);
 
     // Clean up the interval when the component is unmounted
     return () => clearInterval(intervalId);
-  }, []);
+  }, [sleepTime]);
 
   // Rotate lists
   const rotatedLists = emojiLists.map((list) => {
@@ -45,6 +54,8 @@ export default function Level10({ navigation }) {
 
   const handlePress = (emoji) => {
     if (emoji === "🦔") {
+      setSleepTime((prev) => prev * 0.9);
+      playSound(foundSound);
       setFound((prev) => prev + 1);
       setAnimalRows((prev) => prev + 1);
 
@@ -81,10 +92,10 @@ export default function Level10({ navigation }) {
     }
   };
 
-  const restartGame = () =>{
+  const restartGame = () => {
     setFound(0);
     navigation.navigate("Level 1");
-  }
+  };
 
   return (
     <>
@@ -93,14 +104,14 @@ export default function Level10({ navigation }) {
         <Modal animationType="slide" transparent={true} visible={true}>
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text
-                style={styles.modalText} 
-              >{"🏆  🏆  🏆\nYOU WIN!\n🏆  🏆  🏆"}</Text>
-              <Button
-                style={styles.StartGameBtn}
-                title="Restart Game!"
-                onPress={() => restartGame()}
-              />
+              <Text style={styles.modalText}>
+                {"🏆  🏆  🏆\nYOU WIN!\n🏆  🏆  🏆"}
+              </Text>
+              <Pressable 
+                style={styles.restartGameBtn}
+                onPress={() => restartGame()}>
+                  <Text style={styles.buttonText}>Restart Game!</Text>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -163,17 +174,25 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign:"center",
-    color: "rgb(0,180,0)"
+    textAlign: "center",
+    color: "rgb(0,180,0)",
   },
-  modalTextGreen:{
+  modalTextGreen: {
     fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign:"center",
-    color: "rgb(0,180,0)"
+    textAlign: "center",
+    color: "rgb(0,180,0)",
   },
-  StartGameBtn:{
-    borderWidth: 0,
-  }
+  restartGameBtn: {
+    padding: 10,
+    backgroundColor: "#4CAF50",
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingHorizontal: 40,
+  },
 });

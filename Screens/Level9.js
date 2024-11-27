@@ -6,10 +6,7 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Dimensions,
   Modal,
-  TouchableOpacity,
-  Button,
 } from "react-native";
 import { Audio } from "expo-av";
 import wrongSound from "../Sounds/btn_click.mp3";
@@ -200,8 +197,10 @@ export default function Level9({ navigation }) {
   
   useEffect(() => {
 
+    console.log("mounted!");
     if(startGame)
     {
+      console.log("Start game true");
       startTimer(); // Start the timer when start btn pressed
       setAnimalCount((prev) => prev + 50);
       handleShuffle(); // Shuffle emojis when component mounts
@@ -226,7 +225,12 @@ export default function Level9({ navigation }) {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalText}>{`You have ${timeDuration}s To Find 6 🦔 `}</Text>
-              <Button style={styles.StartGameBtn} title="Start Game" onPress={() => setStartGame(true)} />
+              <Pressable 
+                style={styles.startGameBtn}
+                onPress={() => setStartGame(true)}
+              >
+                  <Text style={styles.buttonText}>Start Game</Text>
+              </Pressable>
             </View>
           </View>
         </Modal>
@@ -237,7 +241,7 @@ export default function Level9({ navigation }) {
             <Modal
               visible={true}
               animationType="slide"
-              transparent={true}
+
             >
               <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
@@ -349,7 +353,15 @@ const styles = StyleSheet.create({
     textAlign:"center",
     color: "rgb(0,180,0)"
   },
-  StartGameBtn:{
-    borderWidth: 0,
-  }
+  startGameBtn: {
+    padding: 10,
+    backgroundColor: "#4CAF50",
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+    paddingHorizontal: 40,
+  },
 });
