@@ -8,7 +8,18 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+import { Audio } from "expo-av";
+import btnSound from "../Sounds/btn_click.mp3";
+import wrongSound from '../Sounds/wrongBtn.mp3';
+
 export default function Level7({ navigation }) {
+
+  const playSound = async (soundFile) => {
+    const { sound } = await Audio.Sound.createAsync(soundFile);
+    await sound.playAsync();
+  };
+
+
   // State to control modal visibility, tracking the current question
   const [modalVisible, setModalVisible] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(1); // Start with the first question
@@ -56,10 +67,13 @@ export default function Level7({ navigation }) {
 
   // Function to handle answer selection
   const handleAnswer = (answer) => {
+    
     setUserAnswer(answer);
     const correctAnswer = questions[currentQuestion - 1].correctAnswer;
 
     if (answer === correctAnswer) {
+      playSound(btnSound);
+
       // If correct, move to the next question
       if (currentQuestion < questions.length) {
         setCurrentQuestion(currentQuestion + 1);
@@ -72,6 +86,7 @@ export default function Level7({ navigation }) {
         }, 1000);
       }
     } else {
+      playSound(wrongSound);
       setShowFeedback("Incorrect! Try again!");
       setCurrentQuestion(1); // Restart the game
       setModalVisible(false); // Close all modals
@@ -164,6 +179,7 @@ export default function Level7({ navigation }) {
       <Pressable
         style={styles.startButton}
         onPress={() => {
+          playSound(btnSound);
           setModalVisible(true); // Show the first question modal
           startTimer(); // Start the timer when the quiz begins
           setShowFeedback(""); // Clear any feedback

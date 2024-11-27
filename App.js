@@ -19,8 +19,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Level 9"
-        screenOptions={{ headerShown: true, headerLeft: null }}
+        initialRouteName="Level 8"
+        screenOptions={{ headerShown: true, headerLeft: null, gestureEnabled: false }}
       >
         <Stack.Screen name="Level 1" component={Level1} />
         <Stack.Screen name="Level 2" component={Level2} />

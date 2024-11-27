@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
+import { Audio } from "expo-av";
+import foundSound from "../Sounds/btn_click.mp3";
 
 export default function Level6({ navigation }) {
   const [counter, setCounter] = useState(0);
@@ -7,6 +9,11 @@ export default function Level6({ navigation }) {
   const [intervalTime, setIntervalTime] = useState(1000);
   const [evenCount, setEvenCount] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  const playSound = async (soundFile) => {
+    const { sound } = await Audio.Sound.createAsync(soundFile);
+    await sound.playAsync();
+  };
 
   useEffect(() => {
     let interval;
@@ -31,6 +38,7 @@ export default function Level6({ navigation }) {
   const handleStop = () => {
     if (isButtonDisabled) return;
 
+    playSound(foundSound);
     setIsRunning(false);
 
     if (counter % 2 === 0) {
